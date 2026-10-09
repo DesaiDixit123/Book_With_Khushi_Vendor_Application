@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "499037824146",
+    "project_id": "book-with-khushi",
+    "storage_bucket": "book-with-khushi.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499037824146:android:a1faf579790e7327f6b24b",
+        "android_client_info": {
+          "package_name": "com.bookwithkhushi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvAVjGHW2aa-Or6BwmjSQzCn4kyYxjZy0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499037824146:android:1421213d6008a028f6b24b",
+        "android_client_info": {
+          "package_name": "com.bookwithkhushipartner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvAVjGHW2aa-Or6BwmjSQzCn4kyYxjZy0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
