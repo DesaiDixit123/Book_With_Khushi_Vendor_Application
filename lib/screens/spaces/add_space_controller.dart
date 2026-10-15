@@ -178,7 +178,35 @@ class AddSpaceController extends GetxController {
     if (cat == null) return {};
     final ff = cat['form_fields'];
     if (ff == null || ff is! Map) return {};
-    return Map<String, String>.from(ff.map((k, v) => MapEntry(k.toString(), v.toString())));
+    final map = <String, String>{};
+    ff.forEach((k, v) {
+      if (k.toString().startsWith('_')) return; // ignore internal configs like _tabs, _booking_fields
+      map[k.toString()] = v.toString();
+    });
+    return map;
+  }
+
+  List<String> get activeCategoryTabs {
+    if (selectedCategoryId.value == null) return [];
+    final cat = categories.firstWhereOrNull((c) => c['id'] == selectedCategoryId.value);
+    if (cat == null) return [];
+    if (cat['tabs'] != null && cat['tabs'] is List) {
+      return List<String>.from(cat['tabs'].map((e) => e.toString()));
+    }
+    return [];
+  }
+
+  List<Map<String, dynamic>> get activeCategoryBookingFields {
+    if (selectedCategoryId.value == null) return [];
+    final cat = categories.firstWhereOrNull((c) => c['id'] == selectedCategoryId.value);
+    if (cat == null) return [];
+    if (cat['booking_fields'] != null && cat['booking_fields'] is List) {
+      return (cat['booking_fields'] as List)
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList();
+    }
+    return [];
   }
 
   List<Map<String, dynamic>> get currentSubcategories {
