@@ -852,6 +852,7 @@ class AddSpaceController extends GetxController {
     if (titleController.text.trim().isEmpty) return false;
     if (selectedCategoryId.value == null) return false;
     if (mobileController.text.trim().isNotEmpty && mobileController.text.trim().length < 10) return false;
+    if (whatsappController.text.trim().isNotEmpty && whatsappController.text.trim().length < 10) return false;
     if (emailController.text.trim().isNotEmpty && !GetUtils.isEmail(emailController.text.trim())) return false;
     return true;
   }
@@ -921,6 +922,8 @@ class AddSpaceController extends GetxController {
             SnackbarHelper.showError('Please select a Category');
           } else if (mobileController.text.trim().isNotEmpty && mobileController.text.trim().length < 10) {
             SnackbarHelper.showError('Please enter a valid 10-digit mobile number');
+          } else if (whatsappController.text.trim().isNotEmpty && whatsappController.text.trim().length < 10) {
+            SnackbarHelper.showError('Please enter a valid 10-digit WhatsApp number');
           } else if (emailController.text.trim().isNotEmpty && !GetUtils.isEmail(emailController.text.trim())) {
             SnackbarHelper.showError('Please enter a valid email address');
           }

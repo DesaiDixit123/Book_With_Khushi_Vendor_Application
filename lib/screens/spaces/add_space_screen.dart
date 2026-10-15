@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'add_space_controller.dart';
@@ -246,6 +247,7 @@ class AddSpaceScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Column(
@@ -255,7 +257,22 @@ class AddSpaceScreen extends StatelessWidget {
                       TextFormField(
                         controller: controller.mobileController,
                         keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(hintText: '10-digit Mobile'),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (value) {
+                          final text = value?.trim() ?? '';
+                          if (text.isNotEmpty && text.length < 10) {
+                            return 'Enter 10-digit number';
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          hintText: '10-digit Mobile',
+                          errorMaxLines: 2,
+                        ),
                       ),
                     ],
                   ),
@@ -269,7 +286,22 @@ class AddSpaceScreen extends StatelessWidget {
                       TextFormField(
                         controller: controller.whatsappController,
                         keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(hintText: 'WhatsApp No.'),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: (value) {
+                          final text = value?.trim() ?? '';
+                          if (text.isNotEmpty && text.length < 10) {
+                            return 'Enter 10-digit number';
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          hintText: 'WhatsApp No.',
+                          errorMaxLines: 2,
+                        ),
                       ),
                     ],
                   ),

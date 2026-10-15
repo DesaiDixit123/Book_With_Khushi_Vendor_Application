@@ -6,7 +6,7 @@ class ApiService extends GetxService {
   late Dio _dio;
 
   final String baseUrl = 'https://bookwithkhushi.com/api'; // Live Server
-  // final String baseUrl = 'http://192.168.29.228:8000/api'; // Local Testing
+  // final String baseUrl = 'http://192.168.29.73:8000/api'; // Local Testing
   Future<ApiService> init() async {
     _dio = Dio(BaseOptions(
       baseUrl: baseUrl,
