@@ -291,7 +291,9 @@ class ReferralScreen extends StatelessWidget {
   Future<void> _shareWhatsApp(String shareMsg, String code) async {
     final msg = shareMsg.isNotEmpty
         ? shareMsg
-        : "Join Khushi Holidays as a Vendor using my referral code: $code\nDownload App & Register now: https://bookwithkhushi.com";
+        : "Join Book with Khushi Partner as a Vendor using my referral code: $code\n\n"
+            "🤖 Android Play Store: https://play.google.com/store/apps/details?id=com.bookwithkhushipartner\n"
+            "🍎 iOS App Store: https://apps.apple.com/app/id6774184822";
     final encoded = Uri.encodeComponent(msg);
     final waUri = Uri.parse("whatsapp://send?text=$encoded");
     try {
@@ -310,7 +312,9 @@ class ReferralScreen extends StatelessWidget {
   Future<void> _shareSMS(String shareMsg, String code) async {
     final msg = shareMsg.isNotEmpty
         ? shareMsg
-        : "Join Khushi Holidays as a Vendor using my referral code: $code\nDownload App & Register now: https://bookwithkhushi.com";
+        : "Join Book with Khushi Partner as a Vendor using my referral code: $code\n\n"
+            "🤖 Android Play Store: https://play.google.com/store/apps/details?id=com.bookwithkhushipartner\n"
+            "🍎 iOS App Store: https://apps.apple.com/app/id6774184822";
     final encoded = Uri.encodeComponent(msg);
     final smsUri = Uri.parse("sms:?body=$encoded");
     try {

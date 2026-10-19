@@ -571,6 +571,106 @@ class AddSpaceScreen extends StatelessWidget {
               );
             }),
 
+            // ---------------------------------------------------------
+            // BOOKING FORM ADD-ON / TOGGLE OPTION PRICING
+            // ---------------------------------------------------------
+            Obx(() {
+              final addons = controller.bookingAddonFields;
+              if (addons.isEmpty) return const SizedBox.shrink();
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.golden.withValues(alpha: 0.45),
+                    width: 1.2,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.tune_rounded, size: 19, color: AppColors.navyBlue),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Booking Add-on & Option Prices (₹)',
+                            style: TextStyle(
+                              fontSize: 14.5,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.navyBlue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Set extra price (₹) for customer booking options below (enter 0 if included free):',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                    ),
+                    const SizedBox(height: 12),
+                    ...addons.map((addon) {
+                      final key = addon['key']?.toString() ?? '';
+                      final label = addon['label']?.toString() ?? key;
+                      final ctrl = controller.addonPriceControllers[key];
+                      if (ctrl == null) return const SizedBox.shrink();
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.toggle_on_outlined, size: 18, color: AppColors.navyBlue),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      label,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              flex: 2,
+                              child: TextFormField(
+                                controller: ctrl,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  prefixText: '₹ ',
+                                  hintText: 'Extra Price',
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              );
+            }),
+
 
             // Rental / Space Type Dropdown
             if (controller.isFieldEnabled('timings')) ...[
@@ -674,6 +774,240 @@ class AddSpaceScreen extends StatelessWidget {
                 );
               }),
             ],
+
+            // ---------------------------------------------------------
+            // ADMIN CONFIGURED DETAIL SCREEN TABS CONTENT
+            // ---------------------------------------------------------
+            Obx(() {
+              final tabs = controller.activeCategoryTabs;
+              if (tabs.isEmpty) return const SizedBox.shrink();
+
+              return Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 16),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.navyBlue.withValues(alpha: 0.04),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.navyBlue.withValues(alpha: 0.2),
+                    width: 1.2,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.tab_rounded, size: 20, color: AppColors.navyBlue),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Detail Screen Tabs (Customer App)',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.navyBlue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'These tabs are configured by Admin for this category. Enter details below so customers can view them under each tab in the User App:',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: tabs.map((t) => Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.navyBlue.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          t,
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.navyBlue),
+                        ),
+                      )).toList(),
+                    ),
+                    const SizedBox(height: 14),
+                    ...tabs.map((tabName) {
+                      final tabCtrl = controller.tabContentControllers[tabName];
+                      final lower = tabName.toLowerCase().trim();
+                      final isGalleryTab = lower == 'gallery' || lower == 'photos' || lower == 'portfolio' || lower == 'albums';
+                      final isVideoTab = lower == 'videos' || lower == 'video';
+
+                      if (isGalleryTab) {
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 14.0),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.photo_library_outlined, size: 18, color: AppColors.navyBlue),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Text(
+                                            '$tabName Tab (Photos & Videos)',
+                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Obx(() => Text(
+                                    '${controller.selectedGalleryImages.length + controller.existingGalleryUrls.length}/20 Photos',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.navyBlue),
+                                  )),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: controller.pickGalleryImages,
+                                      icon: const Icon(Icons.add_a_photo, size: 16),
+                                      label: const Text('Add Photos', style: TextStyle(fontSize: 12.5)),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.navyBlue,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      onPressed: controller.pickVideo,
+                                      icon: const Icon(Icons.videocam_outlined, size: 18),
+                                      label: const Text('Add Video', style: TextStyle(fontSize: 12.5)),
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: AppColors.navyBlue,
+                                        padding: const EdgeInsets.symmetric(vertical: 10),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              _buildGalleryGrid(controller),
+                              _buildVideosList(controller),
+                            ],
+                          ),
+                        );
+                      }
+
+                      if (isVideoTab) {
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 14.0),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.videocam_outlined, size: 18, color: AppColors.navyBlue),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Text(
+                                            '$tabName Tab (Videos)',
+                                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black87),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Obx(() => Text(
+                                    '${controller.selectedVideos.length + controller.existingVideoUrls.length}/5 Videos',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.navyBlue),
+                                  )),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              OutlinedButton.icon(
+                                onPressed: controller.pickVideo,
+                                icon: const Icon(Icons.videocam, size: 18),
+                                label: const Text('Upload Video File'),
+                              ),
+                              const SizedBox(height: 10),
+                              _buildVideosList(controller),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 14.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.article_outlined,
+                                  size: 16,
+                                  color: AppColors.navyBlue,
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    '$tabName Tab Details',
+                                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5, color: Colors.black87),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            TextFormField(
+                              controller: tabCtrl,
+                              maxLines: 3,
+                              decoration: InputDecoration(
+                                hintText: 'Enter details, items, or special highlights for "$tabName" tab...',
+                                fillColor: Colors.white,
+                                filled: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(color: Colors.grey.shade300),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              );
+            }),
 
             // Amenities Selection
             if (controller.isFieldEnabled('amenities') && controller.amenities.isNotEmpty) ...[

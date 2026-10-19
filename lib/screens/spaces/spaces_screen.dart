@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'spaces_controller.dart';
 import '../../constants/app_colors.dart';
+import '../../services/api_service.dart';
 import '../../widgets/app_drawer.dart';
 
 class SpacesScreen extends StatelessWidget {
@@ -302,7 +305,7 @@ class SpacesScreen extends StatelessWidget {
                 ),
                 const Divider(height: 20),
 
-                // Card Action Buttons Row: View, Edit, Delete
+                // Card Action Buttons Row: Edit, Share, Delete
                 Row(
                   children: [
                     Expanded(
@@ -313,6 +316,19 @@ class SpacesScreen extends StatelessWidget {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           foregroundColor: AppColors.navyBlue,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _shareVendorSpace(context, space),
+                        icon: const Icon(Icons.share_outlined, size: 14),
+                        label: const Text('Share', style: TextStyle(fontSize: 12)),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          foregroundColor: Colors.teal.shade700,
+                          side: BorderSide(color: Colors.teal.shade700),
                         ),
                       ),
                     ),
@@ -336,6 +352,95 @@ class SpacesScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _shareVendorSpace(BuildContext context, Map<String, dynamic> space) {
+    final spaceId = space['id']?.toString() ?? '';
+    final title = space['title']?.toString() ?? 'Service';
+    final rawBase = Get.find<ApiService>().baseUrl;
+    final serverBase = rawBase.endsWith('/api')
+        ? rawBase.substring(0, rawBase.length - 4)
+        : rawBase;
+    final smartUrl = '$serverBase/share/space/$spaceId';
+    final msg = '🌟 *$title*\n\n'
+        '👉 Tap this link to open & book directly in *Book with Khushi* App:\n'
+        '$smartUrl\n\n'
+        '📲 *Download Book with Khushi Customer App:*\n'
+        '🤖 Android Play Store: https://play.google.com/store/apps/details?id=com.bookwithkhushi\n'
+        '🍎 iOS App Store: https://apps.apple.com/app/id6773082164';
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Share "$title"',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      icon: const Icon(Icons.close, color: Colors.redAccent),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF25D366),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () async {
+                        Navigator.of(ctx).pop();
+                        final uri = Uri.parse(
+                            'https://api.whatsapp.com/send?text=${Uri.encodeComponent(msg)}');
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      },
+                      icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                      label: const Text('WhatsApp'),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: msg));
+                        Navigator.of(ctx).pop();
+                        Get.snackbar(
+                          'Copied!',
+                          'Space share link copied to clipboard',
+                          backgroundColor: AppColors.navyBlue,
+                          colorText: Colors.white,
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                      },
+                      icon: const Icon(Icons.copy, size: 18),
+                      label: const Text('Copy Link'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -67,6 +67,8 @@ class AddSpaceController extends GetxController {
   // STEP 2: DYNAMIC CATEGORY DETAILS
   // -------------------------------------------------------------
   final customFieldControllers = <String, TextEditingController>{}.obs;
+  final tabContentControllers = <String, TextEditingController>{}.obs;
+  final addonPriceControllers = <String, TextEditingController>{}.obs;
   final sizeController = TextEditingController();
   final maxGuestController = TextEditingController();
   final minGuestController = TextEditingController();
@@ -209,6 +211,14 @@ class AddSpaceController extends GetxController {
     return [];
   }
 
+  List<Map<String, dynamic>> get bookingAddonFields {
+    final fields = activeCategoryBookingFields;
+    return fields.where((f) {
+      final type = f['type']?.toString().toLowerCase() ?? '';
+      return type == 'toggle';
+    }).toList();
+  }
+
   List<Map<String, dynamic>> get currentSubcategories {
     if (selectedCategoryId.value == null) return [];
     final cat = categories.firstWhereOrNull((c) => c['id'] == selectedCategoryId.value);
@@ -250,45 +260,74 @@ class AddSpaceController extends GetxController {
     if (cat == null) return [];
     final catName = cat['name'].toString().toLowerCase();
 
-    if (catName.contains('cake') || catName.contains('bakery')) {
-      return ['Black Forest', 'Chocolate Truffle', 'Red Velvet', 'Pineapple', 'Butterscotch', 'Fresh Fruit Cake', 'Birthday Cake', 'Wedding Designer Cake', 'Photo Cake', 'Eggless Cake'];
-    } else if (catName.contains('photo') || catName.contains('studio')) {
-      return ['Wedding Photography', 'Pre Wedding', 'Candid Photography', 'Traditional Photography', 'Cinematic Shoot', 'Drone Photography', 'Baby Shoot', 'Maternity Shoot', 'Corporate Shoot', 'Fashion Shoot'];
-    } else if (catName.contains('anchor') || catName.contains('emcee')) {
-      return ['Wedding Sangeet', 'Reception', 'Sangeet & Garba', 'Corporate Event', 'Birthday Party', 'Kids Event', 'College Event'];
-    } else if (catName.contains('dj') || catName.contains('sound') || catName.contains('music')) {
-      return ['DJ Setup', 'Live Band', 'Sound System', 'Light & Sound Setup', 'DJ + Sound + LED Wall'];
-    } else if (catName.contains('banquet') || catName.contains('hall') || catName.contains('marriage hall')) {
-      return ['Main Grand AC Banquet', 'Outdoor Lawn', 'Indoor Hall', 'AC Hall', 'Non AC Hall', 'Luxury Hall', 'Party Hall'];
-    } else if (catName.contains('decor') || catName.contains('decorator') || catName.contains('theme')) {
-      return ['Royal Floral Theme', 'Wedding Decoration', 'Reception Decoration', 'Haldi & Mehndi Setup', 'Birthday Theme Decor', 'Baby Shower Decor', 'Corporate Theme', 'Balloon & Floral Decor', 'Mandap Decoration'];
-    } else if (catName.contains('planner') || catName.contains('event')) {
-      return ['Full Wedding Management', 'Day-of Coordination', 'Birthday Party Planning', 'Anniversary Management', 'Engagement Planning', 'Corporate Event Planning'];
-    } else if (catName.contains('mehndi') || catName.contains('mehendi')) {
-      return ['Bridal Mehndi', 'Arabic Mehndi', 'Indo Arabic Mehndi', 'Traditional Mehndi', 'Portrait Mehndi', 'Minimalist Mehndi', 'Family / Sider Mehndi'];
-    } else if (catName.contains('hotel')) {
-      return ['Deluxe AC Room', 'Super Deluxe Room', 'Executive Suite', 'Standard AC Room', 'Luxury Suite', 'Family Room'];
-    } else if (catName.contains('resort')) {
-      return ['Luxury Villa', 'Pool Resort Cottage', 'Wedding Resort Suite', 'Nature Cottage', 'Deluxe Resort Room'];
-    } else if (catName.contains('farm') || catName.contains('lawn') || catName.contains('party plot')) {
-      return ['Wedding Farm Plot', 'Grand Party Plot', 'Garden & Lawn', 'Poolside Plot', 'Outdoor Farmhouse'];
-    } else if (catName.contains('makeup') || catName.contains('make up') || catName.contains('make-up') || catName.contains('mua')) {
-      return ['Bridal Makeup', 'Party Makeup', 'HD Makeup', 'Airbrush Makeup', 'Groom Makeup', 'Hair Styling & Draping', 'Saree Draping'];
-    } else if (catName.contains('cater') || catName.contains('food')) {
-      return ['Pure Veg Standard', 'Premium Gujarati Thali', 'Punjabi Feast', 'Jain Special Thali', 'Multi Cuisine Live Counter', 'Chinese & Continental', 'South Indian Feast'];
-    } else if (catName.contains('invitation') || catName.contains('card')) {
-      return ['Wedding Box Invitation', 'Acrylic Royal Card', 'Digital Video Invite', 'Laser Cut Invitation', 'Classic Printed Card'];
-    } else if (catName.contains('jewel') || catName.contains('ornament')) {
-      return ['Bridal Kundan Set', 'Diamond Choker Set', 'Temple Jewellery Set', 'Polki Jewellery Set', 'Artificial Bridal Set'];
-    } else if (catName.contains('design') || catName.contains('wear') || catName.contains('boutique') || catName.contains('dress')) {
-      return ['Bridal Designer Lehenga', 'Groom Royal Sherwani', 'Sider / Bridesmaid Lehenga', 'Custom Designer Gown', 'Indo Western Sherwani'];
-    } else if (catName.contains('car') || catName.contains('buggy') || catName.contains('vehicle')) {
-      return ['Vintage Royal Car', 'Luxury Sedan (BMW/Audi)', 'Royal Horse Buggy', 'Open Luxury Car', 'Luxury SUV (Fortuner)'];
-    } else if (catName.contains('pandit') || catName.contains('pooja') || catName.contains('puja')) {
-      return ['Wedding Ceremony Pooja', 'Grih Pravesh Pooja', 'Satyanarayan Katha', 'Vastu Shanti Pooja', 'Mundan Ceremony', 'Engagement Pooja'];
+    final List<String> baseList = [];
+    // Include options from Admin-configured primary select booking fields
+    for (final f in activeCategoryBookingFields) {
+      final fType = f['type']?.toString().toLowerCase() ?? '';
+      final fKey = f['key']?.toString().toLowerCase() ?? '';
+      if (fType == 'select' &&
+          !fKey.contains('weight') &&
+          !fKey.contains('slot') &&
+          !fKey.contains('time') &&
+          !fKey.contains('language') &&
+          !fKey.contains('gender') &&
+          !fKey.contains('indoor_outdoor') &&
+          !fKey.contains('rental_or_purchase')) {
+        final rawOpts = f['options'];
+        if (rawOpts is List) {
+          for (final o in rawOpts) {
+            final s = o.toString().trim();
+            if (s.isNotEmpty && !baseList.contains(s)) baseList.add(s);
+          }
+        }
+      }
     }
 
-    return ['Standard Option', 'Premium Option', 'Custom Package'];
+    List<String> defaults = [];
+    if (catName.contains('cake') || catName.contains('bakery')) {
+      defaults = ['Black Forest', 'Chocolate Truffle', 'Red Velvet', 'Pineapple', 'Butterscotch', 'Fresh Fruit', 'Rasmalai', 'Belgian Chocolate', 'Birthday Cake', 'Wedding Designer Cake'];
+    } else if (catName.contains('photo') || catName.contains('studio')) {
+      defaults = ['Wedding Photography', 'Pre Wedding', 'Candid Photography', 'Traditional Photography', 'Cinematic Shoot', 'Drone Photography', 'Baby Shoot', 'Maternity Shoot', 'Corporate Shoot', 'Fashion Shoot'];
+    } else if (catName.contains('anchor') || catName.contains('emcee')) {
+      defaults = ['Wedding Sangeet', 'Reception', 'Sangeet & Garba', 'Corporate Event', 'Birthday Party', 'Kids Event', 'College Event'];
+    } else if (catName.contains('dj') || catName.contains('sound') || catName.contains('music')) {
+      defaults = ['DJ Setup', 'Live Band', 'Sound System', 'Light & Sound Setup', 'DJ + Sound + LED Wall'];
+    } else if (catName.contains('banquet') || catName.contains('hall') || catName.contains('marriage hall')) {
+      defaults = ['Main Grand AC Banquet', 'Outdoor Lawn', 'Indoor Hall', 'AC Hall', 'Non AC Hall', 'Luxury Hall', 'Party Hall'];
+    } else if (catName.contains('decor') || catName.contains('decorator') || catName.contains('theme')) {
+      defaults = ['Royal Floral Theme', 'Wedding Decoration', 'Reception Decoration', 'Haldi & Mehndi Setup', 'Birthday Theme Decor', 'Baby Shower Decor', 'Corporate Theme', 'Balloon & Floral Decor', 'Mandap Decoration'];
+    } else if (catName.contains('planner') || catName.contains('event')) {
+      defaults = ['Full Wedding Management', 'Day-of Coordination', 'Birthday Party Planning', 'Anniversary Management', 'Engagement Planning', 'Corporate Event Planning'];
+    } else if (catName.contains('mehndi') || catName.contains('mehendi')) {
+      defaults = ['Bridal Mehndi', 'Arabic Mehndi', 'Indo Arabic Mehndi', 'Traditional Mehndi', 'Portrait Mehndi', 'Minimalist Mehndi', 'Family / Sider Mehndi'];
+    } else if (catName.contains('hotel')) {
+      defaults = ['Deluxe AC Room', 'Super Deluxe Room', 'Executive Suite', 'Standard AC Room', 'Luxury Suite', 'Family Room'];
+    } else if (catName.contains('resort')) {
+      defaults = ['Luxury Villa', 'Pool Resort Cottage', 'Wedding Resort Suite', 'Nature Cottage', 'Deluxe Resort Room'];
+    } else if (catName.contains('farm') || catName.contains('lawn') || catName.contains('party plot')) {
+      defaults = ['Wedding Farm Plot', 'Grand Party Plot', 'Garden & Lawn', 'Poolside Plot', 'Outdoor Farmhouse'];
+    } else if (catName.contains('makeup') || catName.contains('make up') || catName.contains('make-up') || catName.contains('mua')) {
+      defaults = ['Bridal Makeup', 'Party Makeup', 'HD Makeup', 'Airbrush Makeup', 'Groom Makeup', 'Hair Styling & Draping', 'Saree Draping'];
+    } else if (catName.contains('cater') || catName.contains('food')) {
+      defaults = ['Pure Veg Standard', 'Premium Gujarati Thali', 'Punjabi Feast', 'Jain Special Thali', 'Multi Cuisine Live Counter', 'Chinese & Continental', 'South Indian Feast'];
+    } else if (catName.contains('invitation') || catName.contains('card')) {
+      defaults = ['Wedding Box Invitation', 'Acrylic Royal Card', 'Digital Video Invite', 'Laser Cut Invitation', 'Classic Printed Card'];
+    } else if (catName.contains('jewel') || catName.contains('ornament')) {
+      defaults = ['Bridal Kundan Set', 'Diamond Choker Set', 'Temple Jewellery Set', 'Polki Jewellery Set', 'Artificial Bridal Set'];
+    } else if (catName.contains('design') || catName.contains('wear') || catName.contains('boutique') || catName.contains('dress')) {
+      defaults = ['Bridal Designer Lehenga', 'Groom Royal Sherwani', 'Sider / Bridesmaid Lehenga', 'Custom Designer Gown', 'Indo Western Sherwani'];
+    } else if (catName.contains('car') || catName.contains('buggy') || catName.contains('vehicle')) {
+      defaults = ['Vintage Royal Car', 'Luxury Sedan (BMW/Audi)', 'Royal Horse Buggy', 'Open Luxury Car', 'Luxury SUV (Fortuner)'];
+    } else if (catName.contains('pandit') || catName.contains('pooja') || catName.contains('puja')) {
+      defaults = ['Wedding Ceremony Pooja', 'Grih Pravesh Pooja', 'Satyanarayan Katha', 'Vastu Shanti Pooja', 'Mundan Ceremony', 'Engagement Pooja'];
+    } else {
+      defaults = ['Standard Option', 'Premium Option', 'Custom Package'];
+    }
+
+    for (final d in defaults) {
+      if (!baseList.contains(d)) baseList.add(d);
+    }
+    return baseList;
   }
 
   bool isFieldEnabled(String key) {
@@ -511,6 +550,20 @@ class AddSpaceController extends GetxController {
       }
       _initialCustomFields.addAll(savedCustom);
       savedCustom.forEach((key, value) {
+        if (key == '_tab_content' || key == 'tab_content') {
+          dynamic parsedTabs = value;
+          if (parsedTabs is String && parsedTabs.trim().isNotEmpty) {
+            try { parsedTabs = jsonDecode(parsedTabs); } catch (_) {}
+          }
+          if (parsedTabs is Map) {
+            parsedTabs.forEach((tk, tv) {
+              if (tv != null && tv.toString().trim().isNotEmpty) {
+                _initialTabContents[tk.toString()] = tv.toString();
+              }
+            });
+          }
+          return;
+        }
         customFieldControllers[key] = TextEditingController(text: value.toString());
       });
 
@@ -524,6 +577,20 @@ class AddSpaceController extends GetxController {
           final typeName = k.toString().trim();
           if (typeName.isNotEmpty) {
             _initialTypePricing[typeName] = v;
+          }
+        });
+      }
+
+      // Restore addon_pricing map (Booking Toggle / Option prices)
+      dynamic rawAp = savedCustom['addon_pricing'] ?? savedCustom['_addon_pricing'] ?? args['addon_pricing'];
+      if (rawAp is String && rawAp.trim().isNotEmpty) {
+        try { rawAp = jsonDecode(rawAp); } catch (_) {}
+      }
+      if (rawAp is Map) {
+        rawAp.forEach((k, v) {
+          final addonKey = k.toString().trim();
+          if (addonKey.isNotEmpty) {
+            _initialAddonPricing[addonKey] = v;
           }
         });
       }
@@ -609,7 +676,9 @@ class AddSpaceController extends GetxController {
 
   int? _initialCategoryId;
   final Map<String, dynamic> _initialCustomFields = {};
+  final Map<String, String> _initialTabContents = {};
   final Map<String, dynamic> _initialTypePricing = {};
+  final Map<String, dynamic> _initialAddonPricing = {};
   final List<String> _initialSelectedTypes = [];
 
   void _restoreTypePricing() {
@@ -680,6 +749,16 @@ class AddSpaceController extends GetxController {
     }
     customFieldControllers.clear();
 
+    for (final c in tabContentControllers.values) {
+      c.dispose();
+    }
+    tabContentControllers.clear();
+
+    for (final c in addonPriceControllers.values) {
+      c.dispose();
+    }
+    addonPriceControllers.clear();
+
     if (!isSameAsInitial) {
       for (final c in typePriceControllers.values) {
         c.dispose();
@@ -691,8 +770,39 @@ class AddSpaceController extends GetxController {
 
     final fields = customFields;
     for (final entry in fields) {
-      final initialVal = _initialCustomFields[entry.key]?.toString() ?? '';
+      final initialVal = isSameAsInitial ? (_initialCustomFields[entry.key]?.toString() ?? '') : '';
       customFieldControllers[entry.key] = TextEditingController(text: initialVal);
+    }
+
+    final tabs = activeCategoryTabs;
+    for (final tabName in tabs) {
+      final slugKey = 'tab_${tabName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_')}';
+      String initialTabVal = '';
+      if (isSameAsInitial) {
+        initialTabVal = _initialTabContents[tabName] ??
+            _initialCustomFields[slugKey]?.toString() ??
+            _initialCustomFields[tabName]?.toString() ??
+            '';
+      }
+      tabContentControllers[tabName] = TextEditingController(text: initialTabVal);
+    }
+
+    for (final addonField in bookingAddonFields) {
+      final key = addonField['key']?.toString() ?? '';
+      final label = addonField['label']?.toString() ?? key;
+      if (key.isEmpty) continue;
+      String initialPriceVal = '';
+      if (isSameAsInitial) {
+        final rawVal = _initialAddonPricing[key] ??
+            _initialAddonPricing[label] ??
+            _initialTypePricing[key] ??
+            _initialTypePricing[label];
+        if (rawVal != null && rawVal.toString().trim().isNotEmpty) {
+          final parsed = double.tryParse(rawVal.toString());
+          initialPriceVal = parsed != null ? parsed.toStringAsFixed(0) : rawVal.toString();
+        }
+      }
+      addonPriceControllers[key] = TextEditingController(text: initialPriceVal);
     }
 
     if (isSameAsInitial) {
@@ -700,6 +810,8 @@ class AddSpaceController extends GetxController {
     }
 
     customFieldControllers.refresh();
+    tabContentControllers.refresh();
+    addonPriceControllers.refresh();
     selectedCategoryTypes.refresh();
     typePriceControllers.refresh();
   }
@@ -713,7 +825,7 @@ class AddSpaceController extends GetxController {
         final rawAmenities = response.data['data']['amenities'] as List;
         amenities.value = rawAmenities.map((a) => Map<String, dynamic>.from(a)).toList();
 
-        if (isEditMode.value && selectedCategoryId.value != null) {
+        if (selectedCategoryId.value != null) {
           _resetAndRebuildCategoryFields();
         }
       }
@@ -1103,12 +1215,49 @@ class AddSpaceController extends GetxController {
         }
       });
 
+      // Detail Screen Tab Contents (configured by Admin per Category)
+      final Map<String, String> tabContentMap = {};
+      tabContentControllers.forEach((tabName, ctrl) {
+        final val = ctrl.text.trim();
+        if (val.isNotEmpty) {
+          tabContentMap[tabName] = val;
+          final slugKey = 'tab_${tabName.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_')}';
+          formData.fields.add(MapEntry('custom_fields[$slugKey]', val));
+        }
+      });
+      if (tabContentMap.isNotEmpty) {
+        formData.fields.add(MapEntry('custom_fields[_tab_content]', jsonEncode(tabContentMap)));
+      }
+
       // Type pricing & selected types
       if (typePricingMap.isNotEmpty) {
         formData.fields.add(MapEntry('type_pricing', jsonEncode(typePricingMap)));
         formData.fields.add(MapEntry('selected_types', jsonEncode(selectedCategoryTypes.toList())));
         formData.fields.add(MapEntry('custom_fields[type_pricing]', jsonEncode(typePricingMap)));
         formData.fields.add(MapEntry('custom_fields[selected_types]', jsonEncode(selectedCategoryTypes.toList())));
+      }
+
+      // Booking Add-on / Toggle Option Pricing (e.g. Eggless Cake, Photo Printed Cake, Extra Bed, etc.)
+      final Map<String, dynamic> addonPricingMap = {};
+      for (final addonField in bookingAddonFields) {
+        final key = addonField['key']?.toString() ?? '';
+        final label = addonField['label']?.toString() ?? key;
+        if (key.isEmpty) continue;
+        final ctrl = addonPriceControllers[key];
+        final rawText = ctrl?.text.trim() ?? '';
+        if (rawText.isNotEmpty) {
+          final p = double.tryParse(rawText);
+          if (p != null && p >= 0) {
+            addonPricingMap[key] = p;
+            if (label.isNotEmpty) {
+              addonPricingMap[label] = p;
+            }
+          }
+        }
+      }
+      if (addonPricingMap.isNotEmpty) {
+        formData.fields.add(MapEntry('addon_pricing', jsonEncode(addonPricingMap)));
+        formData.fields.add(MapEntry('custom_fields[addon_pricing]', jsonEncode(addonPricingMap)));
       }
 
       // Files: Thumbnail & Cover
@@ -1298,6 +1447,12 @@ class AddSpaceController extends GetxController {
     refundPolicyController.dispose();
 
     for (final c in customFieldControllers.values) {
+      c.dispose();
+    }
+    for (final c in tabContentControllers.values) {
+      c.dispose();
+    }
+    for (final c in addonPriceControllers.values) {
       c.dispose();
     }
     super.onClose();

